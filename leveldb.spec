@@ -1,8 +1,8 @@
 Name:           leveldb
 Version:        1.20
-Release:        4
+Release:        5
 Summary:        A key/value database library
-License:        BSD
+License:        BSD-3-Clause
 URL:            https://github.com/google/leveldb
 Source0:        https://github.com/google/leveldb/archive/v%{version}/%{name}-%{version}.tar.gz
 
@@ -71,5 +71,8 @@ make -j1 check
 %{_libdir}/pkgconfig/leveldb.pc
 
 %changelog
+* Tue May 10 2022 yaoxin <yaoxin30@h-partners.com> - 1.20-5
+- License compliance rectification
+
 * Fri Dec 20 2019 wangyiru <wangyiru1@huawei.com> -  1.20-4
 - Package init
