@@ -1,0 +1,45 @@
+From 7d060117fa0d5cab7cb15b0cf127533bea9ffbc7 Mon Sep 17 00:00:00 2001
+From: proller <proller@github.com>
+Date: Mon, 3 Oct 2016 19:40:07 +0300
+Subject: [PATCH] broken db: fix assertion in leveldb::InternalKey::Encode,
+ mark base as corrupt
+
+---
+ db/dbformat.h      | 6 +++++-
+ db/version_edit.cc | 3 +--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/db/dbformat.h b/db/dbformat.h
+index ea897b1..415dc96 100644
+--- a/db/dbformat.h
++++ b/db/dbformat.h
+@@ -150,7 +150,11 @@ class InternalKey {
+     AppendInternalKey(&rep_, ParsedInternalKey(user_key, s, t));
+   }
+ 
+-  void DecodeFrom(const Slice& s) { rep_.assign(s.data(), s.size()); }
++  bool DecodeFrom(const Slice& s) {
++    rep_.assign(s.data(), s.size());
++    return !rep_.empty();
++  }
++
+   Slice Encode() const {
+     assert(!rep_.empty());
+     return rep_;
+diff --git a/db/version_edit.cc b/db/version_edit.cc
+index f10a2d5..1eea2d1 100644
+--- a/db/version_edit.cc
++++ b/db/version_edit.cc
+@@ -88,8 +88,7 @@ void VersionEdit::EncodeTo(std::string* dst) const {
+ static bool GetInternalKey(Slice* input, InternalKey* dst) {
+   Slice str;
+   if (GetLengthPrefixedSlice(input, &str)) {
+-    dst->DecodeFrom(str);
+-    return true;
++    return dst->DecodeFrom(str);
+   } else {
+     return false;
+   }
+-- 
+2.40.0.windows.1
+
