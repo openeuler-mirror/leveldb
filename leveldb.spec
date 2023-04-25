@@ -1,6 +1,6 @@
 Name:           leveldb
 Version:        1.20
-Release:        5
+Release:        6
 Summary:        A key/value database library
 License:        BSD
 URL:            https://github.com/google/leveldb
@@ -11,6 +11,7 @@ Patch0002:      0002-Added-a-DB-SuspendCompations-and-DB-ResumeCompaction.patch
 Patch0003:      0003-allow-Get-calls-to-avoid-copies-into-std-string.patch
 Patch0004:      0004-bloom_test-failure-on-big-endian-archs.patch
 Patch0005:      0005-broken-db-fix-assertion-in-leveldb-InternalKey-Encod.patch
+Patch0006:      0006-leveldb-Fix-alignment-code-in-SSE4.2-optimized-CRC32.patch
 
 BuildRequires:  make gcc-c++ snappy-devel
 
@@ -72,6 +73,9 @@ make -j1 check
 %{_libdir}/pkgconfig/leveldb.pc
 
 %changelog
+* Tue Apr 25 2023 yaoguangzhong <yaoguangzhong@xfusion.com> -  1.20-6
+- fix alignment code in SSE4.2-optimized CRC32C
+
 * Tue Apr 18 2023 yaoguangzhong <yaoguangzhong@xfusion.com> -  1.20-5
 - fix assertion in leveldb::InternalKey::Encode, mark base as corrupt
 
