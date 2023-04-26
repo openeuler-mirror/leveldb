@@ -1,0 +1,40 @@
+From 2964b803b857932ff7499d7bebb61dc5514dab7c Mon Sep 17 00:00:00 2001
+From: costan <costan@google.com>
+Date: Wed, 23 Aug 2017 20:59:46 -0700
+Subject: [PATCH] leveldb: Fix alignment code in SSE4.2-optimized CRC32C.
+
+When faced with a pointer that is misaligned by K bytes (pointer % 8 ==
+K), the code previously moved forward by K bytes. In order to end up
+with an aligned pointer, the code must move by 8 - K bytes.
+
+This lands https://github.com/google/leveldb/pull/488
+
+-------------
+Created by MOE: https://github.com/google/moe
+MOE_MIGRATED_REVID=166295921
+---
+ port/port_posix_sse.cc | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/port/port_posix_sse.cc b/port/port_posix_sse.cc
+index 1e519ba..08d9aee 100644
+--- a/port/port_posix_sse.cc
++++ b/port/port_posix_sse.cc
+@@ -92,8 +92,12 @@ uint32_t AcceleratedCRC32C(uint32_t crc, const char* buf, size_t size) {
+ } while (0)
+ 
+   if (size > 16) {
+-    // Process unaligned bytes
+-    for (unsigned int i = reinterpret_cast<uintptr_t>(p) % 8; i; --i) {
++    // Point x at first 8-byte aligned byte in string. This must be inside the
++    // string, due to the size check above.
++    const uintptr_t pval = reinterpret_cast<uintptr_t>(p);
++    const uint8_t* x = reinterpret_cast<const uint8_t*>(((pval + 7) >> 3) << 3);
++    // Process bytes until p is 8-byte aligned.
++    while (p != x) {
+       STEP1;
+     }
+ 
+-- 
+2.40.0.windows.1
+
