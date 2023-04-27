@@ -1,7 +1,7 @@
 %undefine __cmake_in_source_build
 Name:           leveldb
 Version:        1.23
-Release:        1
+Release:        2
 Summary:        A fast and lightweight key/value database library by Google
 License:        BSD-3-Clause
 URL:            https://github.com/google/leveldb
@@ -52,11 +52,15 @@ EOF
 
 %build
 
+%if "%toolchain" == "clang"
+export CXXFLAGS="$CXXFLAGS -Wno-error=reorder-ctor"
+%else
 export CFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/generic-hardened-cc1  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection '
 export CXXFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/generic-hardened-cc1  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection '
 export FFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/generic-hardened-cc1  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection  -I/usr/lib64/gfortran/modules'
 export  FCFLAGS='-O2 -g -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -grecord-gcc-switches -specs=/usr/lib/rpm/generic-hardened-cc1  -mtune=generic -fasynchronous-unwind-tables -fstack-clash-protection  -I/usr/lib64/gfortran/modules'
 export LDFLAGS='-Wl,-z,relro   -Wl,-z,now -specs=/usr/lib/rpm/generic-hardened-ld'
+%endif
 
 mkdir build && cd build
 
@@ -102,6 +106,9 @@ make install
 
 
 %changelog
+* Wed Apr 26 2023 Xiaoya Huang <huangxiaoya@iscas.ac.cn> - 1.23-2
+- Fix CC compiler support
+
 * Fri Dec 16 2022 huyab<1229981468@qq.com> - 1.23-1
 - update version to 1.23
 
